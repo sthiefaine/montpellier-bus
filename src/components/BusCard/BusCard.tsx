@@ -6,6 +6,7 @@ import StatusTime from "../StatusTime/StatusTime";
 import StatusDate from "../StatusDate/StatusDate";
 import BusIdentifier from "../BusIdentifier/BusIdentifier";
 import StopsVisualizer from "../StopsVisualizer/StopsVisualizer";
+import NumberFlow from "@number-flow/react";
 
 interface BusCardProps {
   bus: Bus;
@@ -32,7 +33,7 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
 
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % totalStops);
-    }, 5000);
+    }, 8000);
 
     return () => clearInterval(timer);
   }, [totalStops, disableAnimation]);
@@ -78,7 +79,14 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
                     alreadyPassed ? "text-gray-400" : "text-gray-600"
                   }`}
                 >
-                  {currentIndex + 1}/{totalStops} : {currentStop.stop.name}
+                  {
+                    <NumberFlow
+                      willChange
+                      digits={{ 1: { max: totalStops } }}
+                      value={currentIndex + 1}
+                    />
+                  }
+                  /{totalStops} : {currentStop.stop.name}
                 </span>
               </div>
             )}

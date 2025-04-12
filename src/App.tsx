@@ -15,6 +15,7 @@ import checkServerStatusAction from "./actions/serverStateActions";
 import BusStorage from "./utils/busStorage";
 import useOnlineStatus from "./hooks/useOnlineStatus";
 import Footer from "./components/Footer/Footer";
+import useAutoScroll from "./hooks/useAutoScroll";
 
 import "./App.css";
 
@@ -36,6 +37,11 @@ const App = () => {
 
   const initialFetchDone = useRef<boolean>(false);
   const lastSuccessfulBusSchedules = useRef<Bus[]>([]);
+
+  const { busRefs, scrollContainerRef, firstActiveBusIndex } = useAutoScroll(
+    filteredBusSchedules,
+    loading
+  );
 
   useEffect(() => {
     const { buses, timestamp } = BusStorage.loadBusSchedules();
@@ -180,9 +186,6 @@ const App = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 pb-6">
       <Header />
-
-      <div className="pt-30"></div>
-
       <CompanyFilter
         serverStatus={serverStatus}
         companies={COMPANIES}
@@ -191,8 +194,41 @@ const App = () => {
         isRefreshing={isPending || refreshing}
       />
 
-      {/* Liste des bus */}
-      <div className="w-full max-w-2xl mx-auto p-2 mb-8">
+      <div className="pt-30"></div>
+
+      {firstActiveBusIndex > 0 && filteredBusSchedules.length > 0 && (
+        <div className="w-full max-w-2xl mx-auto px-2 mb-2 mt-2">
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-md flex justify-between items-center">
+            <p className="text-blue-700 text-sm">
+              {firstActiveBusIndex} bus déjà passés
+            </p>
+            <button
+              className="text-xs text-blue-600 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full"
+              onClick={() => {
+                if (busRefs.current[firstActiveBusIndex]) {
+                  const headerOffset = 140;
+                  const element = busRefs.current[firstActiveBusIndex];
+                  const offsetPosition =
+                    element!.getBoundingClientRect().top +
+                    window.screenY -
+                    headerOffset;
+                  window.scrollTo({
+                    top: offsetPosition,
+                    behavior: "smooth",
+                  });
+                }
+              }}
+            >
+              Voir prochains bus
+            </button>
+          </div>
+        </div>
+      )}
+
+      <div
+        ref={scrollContainerRef}
+        className="w-full max-w-2xl mx-auto p-2 mb-8"
+      >
         {loading && busSchedules.length === 0 ? (
           <LoadingSpinner />
         ) : error && busSchedules.length === 0 ? (
@@ -207,12 +243,17 @@ const App = () => {
           </div>
         ) : (
           <div className="space-y-2">
-            {filteredBusSchedules.map((bus) => (
-              <BusCard
+            {filteredBusSchedules.map((bus, index) => (
+              <div
                 key={bus.id + bus.scheduledTime + bus.company}
-                bus={bus}
-                stops={bus.calls}
-              />
+                ref={(el) => {
+                  if (el) {
+                    busRefs.current[index] = el;
+                  }
+                }}
+              >
+                <BusCard bus={bus} stops={bus.calls} />
+              </div>
             ))}
           </div>
         )}
