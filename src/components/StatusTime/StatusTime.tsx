@@ -25,7 +25,7 @@ const StatusTime = ({ bus }: StatusTimeProps) => {
         </div>
       )}
       {!bus.isDelayed && bus.deviation_seconds === 0 && (
-        <div className="text-lg font-bold ml-2 text-green-600">
+        <div className="text-base font-bold ml-2 text-green-600">
           {bus.scheduledTime}
         </div>
       )}

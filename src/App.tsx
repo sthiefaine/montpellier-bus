@@ -219,7 +219,7 @@ const App = () => {
                 }
               }}
             >
-              afficher
+              défiler
             </button>
           </div>
         </div>
