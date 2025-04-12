@@ -7,11 +7,11 @@ interface StatusTimeProps {
 const StatusTime = ({ bus }: StatusTimeProps) => {
 
   return (
-    <div className="flex items-baseline">
-      <div className="text-base font-light">Heure :</div>
+    <div className="flex">
+      <div className="text-base font-light mr-1">Heure :</div>
 
       {bus.isDelayed && (
-        <div className="flex items-baseline gap-1 ml-1">
+        <div className="flex flex-row flex-wrap gap-1 ml-1">
           <div className="text-base line-through text-red-500">
             {bus.scheduledTime}
           </div>
@@ -21,9 +21,9 @@ const StatusTime = ({ bus }: StatusTimeProps) => {
         </div>
       )}
       {!bus.isDelayed && bus.deviation_seconds !== 0 && (
-        <div className="flex items-baseline gap-1 ml-1">
+        <div className="flex flex-row flex-wrap gap-1 ml-1">
           <div className="text-base line-through">{bus.scheduledTime}</div>
-          <div className="text-lg font-bold">{bus.delayedTime}</div>
+          <div className="text-base font-bold text-green-600">{bus.delayedTime}</div>
         </div>
       )}
       {!bus.isDelayed && bus.deviation_seconds === 0 && (
