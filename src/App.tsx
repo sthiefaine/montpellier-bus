@@ -11,8 +11,10 @@ import CompanyFilter from "./components/CompanyFilter/CompanyFilter";
 import BusCard from "./components/BusCard/BusCard";
 import LoadingSpinner from "./components/LoadingSpinner/LoadingSpinner";
 import { COMPANIES, UPDATE_INTERVAL } from "./helpers/constants";
-import { formatTimeHHMM } from "./helpers/utils";
 import checkServerStatusAction from "./actions/serverStateActions";
+import BusStorage from "./utils/busStorage";
+import useOnlineStatus from "./hooks/useOnlineStatus";
+import Footer from "./components/Footer/Footer";
 
 import "./App.css";
 
@@ -28,8 +30,26 @@ const App = () => {
     ServerStatusEnum.LOADING
   );
   const [isPending, startTransition] = useTransition();
+  const [cacheTimestamp, setCacheTimestamp] = useState<Date | null>(null);
+
+  const isOnline = useOnlineStatus();
 
   const initialFetchDone = useRef<boolean>(false);
+  const lastSuccessfulBusSchedules = useRef<Bus[]>([]);
+
+  useEffect(() => {
+    const { buses, timestamp } = BusStorage.loadBusSchedules();
+    if (buses.length > 0) {
+      lastSuccessfulBusSchedules.current = buses;
+      setBusSchedules(buses);
+      setFilteredBusSchedules(filterAndSortBuses(buses, selectedCompany));
+      setCacheTimestamp(timestamp);
+
+      if (!isOnline) {
+        setError("Vous êtes hors ligne. Affichage des données en cache.");
+      }
+    }
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -48,7 +68,13 @@ const App = () => {
           setLoading(true);
         }
 
-        const [serverStatus, data, dataBlablabus] = await Promise.all([
+        if (!isOnline) {
+          throw new Error(
+            "Vous êtes hors ligne. Utilisation des données en cache."
+          );
+        }
+
+        const [serverStatusCheck, data, dataBlablabus] = await Promise.all([
           checkServerStatusAction(),
           fetchBusData(),
           fetchBusDataBlablabus(),
@@ -58,6 +84,11 @@ const App = () => {
         const formattedBusesBlablabus = formatBusData(dataBlablabus.rides);
 
         const allBuses = [...formattedBuses, ...formattedBusesBlablabus];
+        if (allBuses.length > 0) {
+          lastSuccessfulBusSchedules.current = allBuses;
+          BusStorage.saveBusSchedules(allBuses);
+          setCacheTimestamp(new Date());
+        }
 
         startTransition(() => {
           setBusSchedules(allBuses);
@@ -71,15 +102,39 @@ const App = () => {
         });
 
         setServerStatus(
-          serverStatus
+          serverStatusCheck
             ? ServerStatusEnum.CONNECTED
             : ServerStatusEnum.DISCONNECTED
         );
+        setError(null);
       } catch (err) {
-        setError(
-          "Erreur lors de la récupération des horaires. Veuillez réessayer."
-        );
+        const errorMessage = !isOnline
+          ? "Vous êtes hors ligne. Affichage des données en cache."
+          : "Erreur lors de la récupération des horaires. Utilisation des données en cache.";
+
+        setError(errorMessage);
         console.error("Erreur:", err);
+
+        setServerStatus(ServerStatusEnum.DISCONNECTED);
+
+        if (lastSuccessfulBusSchedules.current.length > 0) {
+          console.log(
+            "Utilisation des dernières données disponibles:",
+            lastSuccessfulBusSchedules.current.length
+          );
+
+          if (busSchedules.length === 0) {
+            startTransition(() => {
+              setBusSchedules(lastSuccessfulBusSchedules.current);
+              setFilteredBusSchedules(
+                filterAndSortBuses(
+                  lastSuccessfulBusSchedules.current,
+                  selectedCompany
+                )
+              );
+            });
+          }
+        }
       } finally {
         setLoading(false);
         setRefreshing(false);
@@ -95,7 +150,7 @@ const App = () => {
 
     const interval = setInterval(fetchBusDataFromAPI, UPDATE_INTERVAL);
     return () => clearInterval(interval);
-  }, []);
+  }, [isOnline]);
 
   useEffect(() => {
     if (busSchedules.length > 0) {
@@ -107,6 +162,15 @@ const App = () => {
     }
   }, [selectedCompany, busSchedules, startTransition]);
 
+  useEffect(() => {
+    if (isOnline) {
+      console.log("Retour en ligne détecté");
+    } else {
+      console.log("Passage hors ligne détecté");
+      setError("Vous êtes hors ligne. Affichage des données en cache.");
+    }
+  }, [isOnline]);
+
   const handleCompanySelect = (companyId: string) => {
     startTransition(() => {
       setSelectedCompany(companyId);
@@ -114,8 +178,8 @@ const App = () => {
   };
 
   return (
-    <div className="flex flex-col items-center min-h-screen bg-gray-100">
-      <Header currentTime={currentTime} />
+    <div className="flex flex-col items-center min-h-screen bg-gray-100 pb-6">
+      <Header />
 
       <div className="pt-30"></div>
 
@@ -128,10 +192,10 @@ const App = () => {
       />
 
       {/* Liste des bus */}
-      <div className="w-full max-w-2xl mx-auto p-2">
-        {loading ? (
+      <div className="w-full max-w-2xl mx-auto p-2 mb-8">
+        {loading && busSchedules.length === 0 ? (
           <LoadingSpinner />
-        ) : error ? (
+        ) : error && busSchedules.length === 0 ? (
           <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
             <p className="text-red-700">{error}</p>
           </div>
@@ -154,9 +218,11 @@ const App = () => {
         )}
       </div>
 
-      <div className="w-full max-w-2xl mx-auto p-4 text-center text-xs text-gray-500">
-        Dernière mise à jour: {formatTimeHHMM(currentTime)}
-      </div>
+      <Footer
+        currentTime={currentTime}
+        isOnline={isOnline}
+        cacheTimestamp={cacheTimestamp}
+      />
     </div>
   );
 };

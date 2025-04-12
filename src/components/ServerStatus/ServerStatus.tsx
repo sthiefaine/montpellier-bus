@@ -1,5 +1,6 @@
-import React, { useSyncExternalStore } from "react";
+import React from "react";
 import { ServerStatusEnum } from "../../types";
+import useOnlineStatus from "../../hooks/useOnlineStatus";
 
 interface ServerStatusProps {
   className?: string;
@@ -7,65 +8,19 @@ interface ServerStatusProps {
   isRefreshing?: boolean;
 }
 
-// Création d'un store pour l'état de la connexion réseau
-const createNetworkStatusStore = () => {
-  const subscribers = new Set<() => void>();
-
-  let isOnline = typeof navigator !== 'undefined' ? navigator.onLine : true;
-
-  const subscribe = (callback: () => void) => {
-    subscribers.add(callback);
-    
-    window.addEventListener('online', () => {
-      isOnline = true;
-      notifySubscribers();
-    });
-    
-    window.addEventListener('offline', () => {
-      isOnline = false;
-      notifySubscribers();
-    });
-    
-    return () => {
-      subscribers.delete(callback);
-      if (subscribers.size === 0) {
-        window.removeEventListener('online', notifySubscribers);
-        window.removeEventListener('offline', notifySubscribers);
-      }
-    };
-  };
-
-  // Notification de tous les abonnés
-  const notifySubscribers = () => {
-    subscribers.forEach(callback => callback());
-  };
-
-  const getSnapshot = () => isOnline;
-
-  return {
-    subscribe,
-    getSnapshot,
-  };
-};
-
-const networkStore = createNetworkStatusStore();
-
 const ServerStatus = ({
   className = "",
   serverStatus,
   isRefreshing = false,
 }: ServerStatusProps) => {
-  const isOnline = useSyncExternalStore(
-    networkStore.subscribe,
-    networkStore.getSnapshot
-  );
+  const isOnline = useOnlineStatus();
 
   const getStatus = () => {
     if (!isOnline) {
       return {
-        color: "bg-gray-500",
+        color: "bg-orange-500",
         animate: "",
-        text: "Hors ligne"
+        text: "Hors ligne",
       };
     }
 
@@ -73,27 +28,28 @@ const ServerStatus = ({
       return {
         color: "bg-blue-500",
         animate: "animate-pulse",
-        text: "Mise à jour..."
+        text: "Mise à jour...",
       };
     }
+
     switch (serverStatus) {
       case ServerStatusEnum.CONNECTED:
         return {
           color: "bg-green-500",
           animate: "",
-          text: "Connecté"
+          text: "Connecté",
         };
       case ServerStatusEnum.DISCONNECTED:
         return {
           color: "bg-red-500",
           animate: "",
-          text: "Déconnecté"
+          text: "Déconnecté",
         };
       default:
         return {
           color: "bg-yellow-500",
           animate: "animate-pulse",
-          text: "Connexion..."
+          text: "Connexion...",
         };
     }
   };
@@ -105,9 +61,7 @@ const ServerStatus = ({
       <div
         className={`h-3 w-3 rounded-full mr-2 ${status.color} ${status.animate}`}
       />
-      <span className="text-xs font-medium">
-        {status.text}
-      </span>
+      <span className="text-xs font-medium">{status.text}</span>
     </div>
   );
 };

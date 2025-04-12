@@ -1,18 +1,23 @@
-// src/components/Header/Header.tsx
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
-interface HeaderProps {
-  currentTime: Date;
-}
+const Header = () => {
 
-const Header = ({ currentTime }: HeaderProps) => {
+  const [localTime, setLocalTime] = useState<Date>(new Date());
 
-  const formattedTime = currentTime.toLocaleTimeString('fr-FR', {
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setLocalTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, []);
+
+  const formattedTime = localTime.toLocaleTimeString('fr-FR', {
     hour: '2-digit',
     minute: '2-digit'
   });
 
-  const formattedDate = currentTime.toLocaleDateString('fr-FR', {
+  const formattedDate = localTime.toLocaleDateString('fr-FR', {
     weekday: 'long',
     day: 'numeric',
     month: 'long'
@@ -27,7 +32,7 @@ const Header = ({ currentTime }: HeaderProps) => {
             <p className="text-s capitalize">{formattedDate}</p>
           </div>
           <div className="text-right">
-          <p className="text-s">Heure :</p>
+            <p className="text-s">Heure :</p>
             <div className="text-xl font-bold">{formattedTime}</div>
           </div>
         </div>
