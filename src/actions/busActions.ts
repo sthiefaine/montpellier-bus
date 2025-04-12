@@ -10,7 +10,7 @@ const baseUrl = import.meta.env.DEV
  * @returns Données de l'API FlixBus
  */
 export const fetchBusData = async (): Promise<ApiResponse> => {
-  const now = new Date(new Date().setHours(new Date().getHours() - 5));
+  const now = new Date(new Date().setHours(new Date().getHours() - 1));
   const from = now.toISOString();
   const to = new Date(
     new Date().setHours(new Date().getHours() + 5)
@@ -32,7 +32,7 @@ export const fetchBusData = async (): Promise<ApiResponse> => {
  * @returns Données de l'API Blablabus
  */
 export const fetchBusDataBlablabus = async (): Promise<ApiResponse> => {
-  const now = new Date(new Date().setHours(new Date().getHours() - 5));
+  const now = new Date(new Date().setHours(new Date().getHours() - 1));
   const from = now.toISOString();
   const to = new Date(
     new Date().setHours(new Date().getHours() + 5)
@@ -132,24 +132,15 @@ export const filterAndSortBuses = (
 
   // Filtrer pour n'afficher que les bus qui ne sont pas encore partis
   // (ou avec un délai pour voir les bus récemment partis)
-  const tenMinutesAgo = new Date(now.getTime() - 30 * 60 * 1000);
+  const tenMinutesAgo = new Date(now.getTime() - 15 * 60 * 1000);
   filteredBuses = filteredBuses.filter((bus) => {
-    const effectiveTime =
-      bus.isDelayed && bus.delayedDateTime
-        ? bus.delayedDateTime
-        : bus.scheduledDateTime;
+    const effectiveTime = bus.delayedDateTime || bus.scheduledDateTime;
     return effectiveTime >= tenMinutesAgo;
   });
 
   filteredBuses.sort((a, b) => {
-    const timeA =
-      a.isDelayed && a.delayedDateTime
-        ? a.delayedDateTime
-        : a.scheduledDateTime;
-    const timeB =
-      b.isDelayed && b.delayedDateTime
-        ? b.delayedDateTime
-        : b.scheduledDateTime;
+    const timeA = a.delayedDateTime || a.scheduledDateTime;
+    const timeB = b.delayedDateTime || b.scheduledDateTime;
     return timeA.getTime() - timeB.getTime();
   });
 
