@@ -63,6 +63,8 @@ export interface ApiResponse {
   };
 }
 
+export type StatusType = "ON_TIME" | "LATE" | "EARLY" | "CANCELLED" | "PASSED";
+
 export enum ServerStatusEnum {
   CONNECTED = "connected",
   DISCONNECTED = "disconnected",

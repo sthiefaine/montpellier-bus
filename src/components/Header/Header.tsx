@@ -23,7 +23,7 @@ const Header = ({ currentTime }: HeaderProps) => {
       <div className="max-w-2xl mx-auto px-4 py-2">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold">Montpellier Sabines</h1>
+            <h1 className="text-2xl font-bold">Montpellier Sabines</h1>
             <p className="text-s capitalize">{formattedDate}</p>
           </div>
           <div className="text-right">

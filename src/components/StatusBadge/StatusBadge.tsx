@@ -1,24 +1,81 @@
 import React from "react";
-import { getStatusText } from "../../helpers/utils";
+import { StatusType } from "../../types";
 
 interface StatusBadgeProps {
-  status: string;
-  delayMinutes: number;
+  status: StatusType;
+  delayMinutes?: number;
 }
 
-const StatusBadge = ({ status, delayMinutes }: StatusBadgeProps) => {
+const StatusBadge = ({ status, delayMinutes = 0 }: StatusBadgeProps) => {
+  let backgroundColor = "";
+  let textColor = "";
+  let statusText = "";
+  let delayText = "";
+
+  const formatDelay = (minutes: number): string => {
+    if (minutes < 60) {
+      return `${minutes}min`;
+    } else {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      return remainingMinutes > 0
+        ? `${hours}h${remainingMinutes}min`
+        : `${hours}h`;
+    }
+  };
+
+  switch (status) {
+    case "ON_TIME":
+      backgroundColor = "bg-green-100";
+      textColor = "text-green-800";
+      statusText = "À l'heure";
+      break;
+    case "LATE":
+      backgroundColor = "bg-red-100";
+      textColor = "text-red-800";
+      statusText = "Retard";
+      if (delayMinutes) {
+        delayText = formatDelay(delayMinutes);
+      }
+      break;
+    case "EARLY":
+      backgroundColor = "bg-blue-100";
+      textColor = "text-blue-800";
+      statusText = "Avance";
+      if (delayMinutes) {
+        delayText = formatDelay(Math.abs(delayMinutes));
+      }
+      break;
+    case "CANCELLED":
+      backgroundColor = "bg-red-600";
+      textColor = "text-white";
+      statusText = "Annulé";
+      break;
+    case "PASSED":
+      backgroundColor = "bg-gray-200";
+      textColor = "text-gray-600";
+      statusText = "Passé";
+      break;
+    default:
+      backgroundColor = "bg-gray-100";
+      textColor = "text-gray-800";
+      statusText = "Programmé";
+  }
+
   return (
-    <div
-      className={`text-sm px-1 py-1 rounded-full ${
-        status === "ON_TIME"
-          ? "bg-green-100 text-green-800"
-          : status === "LATE"
-          ? "bg-red-100 text-red-800"
-          : "bg-blue-100 text-blue-800"
-      }`}
+    <span
+      className={`px-2 py-1 rounded-full text-xs font-medium ${backgroundColor} ${textColor}`}
     >
-      {getStatusText(status, delayMinutes)}
-    </div>
+      {delayText && delayMinutes >= 60 ? (
+        <div className="flex flex-col items-center text-center">
+          <span>{statusText} {delayText}</span>
+        </div>
+      ) : (
+        <span>
+          {statusText} {delayText}
+        </span>
+      )}
+    </span>
   );
 };
 

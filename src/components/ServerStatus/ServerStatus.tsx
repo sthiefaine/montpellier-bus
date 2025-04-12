@@ -73,7 +73,7 @@ const ServerStatus = ({
       return {
         color: "bg-blue-500",
         animate: "animate-pulse",
-        text: "Mise à jour en cours..."
+        text: "Mise à jour..."
       };
     }
     switch (serverStatus) {
@@ -81,13 +81,13 @@ const ServerStatus = ({
         return {
           color: "bg-green-500",
           animate: "",
-          text: "Serveur connecté"
+          text: "Connecté"
         };
       case ServerStatusEnum.DISCONNECTED:
         return {
           color: "bg-red-500",
           animate: "",
-          text: "Serveur déconnecté"
+          text: "Déconnecté"
         };
       default:
         return {
