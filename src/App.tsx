@@ -203,7 +203,7 @@ const App = () => {
               {firstActiveBusIndex} bus déjà passés
             </p>
             <button
-              className="text-xs text-blue-600 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full"
+              className="text-xs text-blue-600 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full capitalize"
               onClick={() => {
                 if (busRefs.current[firstActiveBusIndex]) {
                   const headerOffset = 140;
@@ -219,7 +219,7 @@ const App = () => {
                 }
               }}
             >
-              Voir prochains bus
+              afficher
             </button>
           </div>
         </div>
@@ -229,34 +229,43 @@ const App = () => {
         ref={scrollContainerRef}
         className="w-full max-w-2xl mx-auto p-2 mb-8"
       >
-        {loading && busSchedules.length === 0 ? (
-          <LoadingSpinner />
-        ) : error && busSchedules.length === 0 ? (
-          <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-            <p className="text-red-700">{error}</p>
-          </div>
-        ) : filteredBusSchedules.length === 0 ? (
-          <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md">
-            <p className="text-yellow-700">
-              Aucun bus disponible pour le moment.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-2">
-            {filteredBusSchedules.map((bus, index) => (
-              <div
-                key={bus.id + bus.scheduledTime + bus.company}
-                ref={(el) => {
-                  if (el) {
-                    busRefs.current[index] = el;
-                  }
-                }}
-              >
-                <BusCard bus={bus} stops={bus.calls} />
+        <>
+          {loading && busSchedules.length === 0 && <LoadingSpinner />}
+
+          {error && busSchedules.length === 0 && (
+            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+              <p className="text-red-700">{error}</p>
+            </div>
+          )}
+
+          {filteredBusSchedules.length === 0 &&
+            !loading &&
+            busSchedules.length === 0 &&
+            !error && (
+              <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md">
+                <p className="text-yellow-700">
+                  Aucun bus disponible pour le moment.
+                </p>
               </div>
-            ))}
-          </div>
-        )}
+            )}
+
+          {filteredBusSchedules.length > 0 && (
+            <div className="space-y-2">
+              {filteredBusSchedules.map((bus, index) => (
+                <div
+                  key={bus.id + bus.scheduledTime + bus.company}
+                  ref={(el) => {
+                    if (el) {
+                      busRefs.current[index] = el;
+                    }
+                  }}
+                >
+                  <BusCard bus={bus} stops={bus.calls} />
+                </div>
+              ))}
+            </div>
+          )}
+        </>
       </div>
 
       <Footer

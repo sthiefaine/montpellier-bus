@@ -23,6 +23,19 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
 
   const busStatus = alreadyPassed ? "PASSED" : (bus.status as StatusType);
 
+  let cardBackgroundColor = "bg-white";
+
+  switch (busStatus) {
+    case "CANCELLED":
+      cardBackgroundColor = "bg-red-50";
+      break;
+    case "PASSED":
+      cardBackgroundColor = "bg-gray-100";
+      break;
+    default:
+      cardBackgroundColor = "bg-white";
+  }
+
   const [currentIndex, setCurrentIndex] = useState(0);
   const totalStops = stops.length;
 
@@ -33,7 +46,7 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
 
     const timer = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % totalStops);
-    }, 8000);
+    }, 6000);
 
     return () => clearInterval(timer);
   }, [totalStops, disableAnimation]);
@@ -45,12 +58,9 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
 
   return (
     <div
-      className={`bg-white rounded-lg overflow-hidden shadow-sm ${
-        alreadyPassed ? "opacity-70" : ""
-      }`}
-      style={{
-        backgroundColor: alreadyPassed ? "#F3F4F6" : "white",
-      }}
+      className={`rounded-lg overflow-hidden shadow-sm ${
+        alreadyPassed || busStatus === "CANCELLED" ? "opacity-70" : ""
+      } ${cardBackgroundColor}`}
     >
       <div className="p-3">
         <div className="flex justify-between items-center">
@@ -73,10 +83,10 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
             </div>
 
             {currentStop && (
-              <div className="text-xs">
+              <div className="text-sm">
                 <span
                   className={` rounded-md line-clamp-1 ${
-                    alreadyPassed ? "text-gray-400" : "text-gray-600"
+                    alreadyPassed ? "text-blue-300" : "text-blue-500"
                   }`}
                 >
                   {

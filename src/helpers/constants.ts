@@ -8,8 +8,9 @@ export const COMPANY_COLORS: Record<string, string> = {
 
 export const COMPANIES: Company[] = [
   { id: 'all', name: 'Tous', color: COMPANY_COLORS['Autre compagnie'] },
+  { id: 'blablabus', name: 'BlaBlaBus', color: COMPANY_COLORS['BlaBlaBus'] },
   { id: 'flixbus', name: 'FlixBus', color: COMPANY_COLORS['FlixBus'] },
-  { id: 'blablabus', name: 'BlaBlaBus', color: COMPANY_COLORS['BlaBlaBus'] }
+
 ];
 
 export const BUS_STATUS = {
