@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Bus, StatusType } from "../../types";
 import StatusBadge from "../StatusBadge/StatusBadge";
 import { Stop } from "../../types";
 import StatusTime from "../StatusTime/StatusTime";
 import StatusDate from "../StatusDate/StatusDate";
 import BusIdentifier from "../BusIdentifier/BusIdentifier";
+import StopsVisualizer from "../StopsVisualizer/StopsVisualizer";
 
 interface BusCardProps {
   bus: Bus;
@@ -12,14 +13,34 @@ interface BusCardProps {
 }
 
 const BusCard = ({ bus, stops }: BusCardProps) => {
-  const departureStop =
-    stops && stops.length > 0 ? stops[0].stop.name : "Inconnu";
   const terminusStop =
     stops && stops.length > 0 ? stops[stops.length - 1].stop.name : "Inconnu";
 
   const alreadyPassed = bus.delayedDateISO
     ? new Date(bus.delayedDateISO) < new Date()
     : bus.scheduledDateTime < new Date();
+
+  const busStatus = alreadyPassed ? "PASSED" : (bus.status as StatusType);
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const totalStops = stops.length;
+
+  const disableAnimation = alreadyPassed || busStatus === "CANCELLED";
+
+  useEffect(() => {
+    if (disableAnimation) return;
+
+    const timer = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % totalStops);
+    }, 5000);
+
+    return () => clearInterval(timer);
+  }, [totalStops, disableAnimation]);
+
+  const currentStop =
+    stops && stops.length > 0 && currentIndex < stops.length
+      ? stops[currentIndex]
+      : null;
 
   return (
     <div
@@ -31,17 +52,14 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
       }}
     >
       <div className="p-3">
-        <div className="flex justify-between items-center mb-1">
-          <StatusBadge
-            status={alreadyPassed ? "PASSED" : (bus.status as StatusType)}
-            delayMinutes={bus.delayMinutes}
-          />
+        <div className="flex justify-between items-center">
+          <StatusBadge status={busStatus} delayMinutes={bus.delayMinutes} />
 
           <StatusTime bus={bus} />
           <StatusDate bus={bus} />
         </div>
 
-        <div className="flex items-center">
+        <div className="flex items-center mb-3">
           <div className="mr-3">
             <BusIdentifier bus={bus} />
           </div>
@@ -52,12 +70,29 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
                 {terminusStop}
               </span>
             </div>
-            <div>
-              <span className="text-xs text-gray-500 truncate">
-                Départ: {departureStop}
-              </span>
-            </div>
+
+            {currentStop && (
+              <div className="text-xs">
+                <span
+                  className={` rounded-md line-clamp-1 ${
+                    alreadyPassed ? "text-gray-400" : "text-gray-600"
+                  }`}
+                >
+                  {currentIndex + 1}/{totalStops} : {currentStop.stop.name}
+                </span>
+              </div>
+            )}
           </div>
+        </div>
+
+        <div>
+          <StopsVisualizer
+            stops={stops}
+            currentIndex={currentIndex}
+            alreadyPassed={alreadyPassed}
+            busStatus={busStatus}
+            onStopClick={setCurrentIndex}
+          />
         </div>
       </div>
     </div>
