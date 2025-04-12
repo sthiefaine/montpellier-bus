@@ -66,8 +66,10 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
         <div className="flex justify-between items-center">
           <StatusBadge status={busStatus} delayMinutes={bus.delayMinutes} />
 
-          <StatusTime bus={bus} />
-          <StatusDate bus={bus} />
+          <div className="flex items-center gap-2">
+            <StatusDate bus={bus} />
+            <StatusTime bus={bus} />
+          </div>
         </div>
 
         <div className="flex items-center mb-3">
