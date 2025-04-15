@@ -7,6 +7,26 @@ vi.mock("@number-flow/react", () => ({
   default: ({ value }) => <span data-testid="number-flow">{value}</span>,
 }));
 
+vi.mock("../../hooks/useTranslation", () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      const translations = {
+        "bus.delay.late": "Retard {{minutes}} min",
+        "bus.status.cancelled": "Annulé",
+        "bus.status.late": "Retard",
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+
+vi.mock("../../contexts/LanguageContext", () => ({
+  useLanguage: () => ({
+    language: "fr",
+    setLanguage: vi.fn(),
+  }),
+}));
+
 describe("BusCard Component", () => {
   const fixedDate = new Date("2025-04-13T15:00:00Z");
   let originalDate;

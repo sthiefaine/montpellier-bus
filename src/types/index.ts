@@ -1,35 +1,47 @@
+export type Language = "fr" | "en" | "es" | "de" | "pt" | "zh" | "ja";
+
+
+export interface Stop {
+  stop: {
+    name: string;
+  };
+  departureTime: string;
+  arrivalTime: string;
+}
+
 export interface Bus {
   id: string;
-  lineCode: string;
   company: string;
-  companyColor: string;
-  destination: string;
   scheduledTime: string;
-  delayedTime: string | null;
+  status: StatusType;
+  calls: Stop[];
+  scheduledDateTime: Date;
+  delayedDateTime: Date | null;
+  scheduledDateISO: string;
+  delayedDateISO: string | null;
   isDelayed: boolean;
   deviation_seconds: number;
   delayMinutes: number;
-  status: string;
-  calls: Stop[];
+  companyColor: string;
+  lineCode: string;
+  destination: string;
+  delayedTime?: string | null;
+}
 
-  scheduledDateTime: Date;
-  delayedDateTime: Date | null; 
-  scheduledDateISO: string; 
-  delayedDateISO: string | null;
+export type StatusType = "ON_TIME" | "DELAYED" | "EARLY" | "CANCELLED" | "PASSED" | "UNKNOWN" | "PROGRAMMED" | "LATE";
+
+export enum ServerStatusEnum {
+  CONNECTED = "CONNECTED",
+  DISCONNECTED = "DISCONNECTED",
+  LOADING = "LOADING",
+  UPDATING = "UPDATING",
+  ERROR = "ERROR",
 }
 
 export interface Company {
   id: string;
   name: string;
   color: string;
-}
-
-export interface Stop {
-  sequence: number;
-  stop: {
-    id: string;
-    name: string;
-  };
 }
 
 export interface RawBusData {
@@ -61,12 +73,4 @@ export interface ApiResponse {
     name: string;
     timezone: string;
   };
-}
-
-export type StatusType = "ON_TIME" | "LATE" | "EARLY" | "CANCELLED" | "PASSED";
-
-export enum ServerStatusEnum {
-  CONNECTED = "connected",
-  DISCONNECTED = "disconnected",
-  LOADING = "loading",
 }

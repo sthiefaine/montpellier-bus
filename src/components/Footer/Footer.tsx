@@ -3,6 +3,7 @@ import { formatTimeHHMM } from "../../helpers/utils";
 import ServerStatus from "../ServerStatus/ServerStatus";
 import { ServerStatusEnum } from "../../types";
 import { Link } from "react-router-dom";
+import { useTranslation } from "../../hooks/useTranslation";
 
 interface FooterProps {
   currentTime: Date;
@@ -19,6 +20,8 @@ const Footer = ({
   serverStatus,
   isRefreshing = false,
 }: FooterProps) => {
+  const { t } = useTranslation();
+
   const getCacheAgeDisplay = () => {
     if (!cacheTimestamp) return "";
 
@@ -26,36 +29,33 @@ const Footer = ({
       (new Date().getTime() - cacheTimestamp.getTime()) / (60 * 1000)
     );
 
-    if (ageInMinutes < 1) return "";
-    if (ageInMinutes === 1) return "il y a 1 minute";
-    if (ageInMinutes < 60) return `il y a ${ageInMinutes} minutes`;
+    if (ageInMinutes < 1) return t("common.ago.now");
+    if (ageInMinutes === 1) return t("common.ago.minute", { minutes: 1 });
+    if (ageInMinutes < 60) return t("common.ago.minutes", { minutes: ageInMinutes });
 
     const ageInHours = Math.floor(ageInMinutes / 60);
-    if (ageInHours === 1) return "il y a 1 heure";
-    if (ageInHours < 24) return `il y a ${ageInHours} heures`;
+    if (ageInHours === 1) return t("common.ago.hour", { hours: 1 });
+    if (ageInHours < 24) return t("common.ago.hours", { hours: ageInHours });
 
     const ageInDays = Math.floor(ageInHours / 24);
-    if (ageInDays === 1) return "il y a 1 jour";
-    return `il y a ${ageInDays} jours`;
+    if (ageInDays === 1) return t("common.ago.day", { days: 1 });
+    return t("common.ago.days", { days: ageInDays });
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-sm border-t border-gray-200 py-1 px-2 text-center text-xs text-gray-500 z-10">
-      <div className="flex justify-between items-center max-w-2xl mx-auto">
+    <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-sm border-t border-gray-200 py-2 px-2 text-center text-xs text-gray-500 z-10">
+      <div className="flex justify-between items-center max-w-2xl mx-auto px-2">
         <ServerStatus
           serverStatus={serverStatus}
           isRefreshing={isRefreshing}
           className="text-xs"
         />
         <div>
-          Mise à jour: {formatTimeHHMM(currentTime)}
-          {!isOnline && cacheTimestamp && ` (Cache ${getCacheAgeDisplay()})`}
+          {formatTimeHHMM(currentTime)}
+          {!isOnline && cacheTimestamp && ` (${t("common.cache")} ${getCacheAgeDisplay()})`}
         </div>
-        <Link
-          to="/infos"
-          className="text-blue-600 hover:text-blue-800"
-        >
-          Infos
+        <Link to="/infos" className="text-blue-600 hover:text-blue-800">
+          {t("common.info")}
         </Link>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import React from "react";
 import { Company } from "../../types";
+import { useTranslation } from "../../hooks/useTranslation";
 
 interface CompanyFilterProps {
   companies: Company[];
@@ -12,12 +13,21 @@ const CompanyFilter = ({
   selectedCompany,
   onSelectCompany,
 }: CompanyFilterProps) => {
+  const { t } = useTranslation();
+
   return (
-    <div className="flex gap-1 overflow-x-auto no-scrollbar">
+    <div 
+      role="radiogroup" 
+      aria-label={t("company.filter.label")}
+      className="flex gap-1 overflow-x-auto no-scrollbar"
+    >
       {companies.map((company) => (
         <button
           key={company.id}
           onClick={() => onSelectCompany(company.id)}
+          role="radio"
+          aria-checked={selectedCompany === company.id}
+          aria-label={t("company.filter.button", { company: t(`company.${company.id.toLowerCase()}`) })}
           style={{
             backgroundColor:
               selectedCompany === company.id ? company.color : "white",
@@ -30,7 +40,7 @@ const CompanyFilter = ({
                     : "text-gray-700"
                 }`}
         >
-          {company.name}
+          {t(`company.${company.id.toLowerCase()}`)}
         </button>
       ))}
     </div>

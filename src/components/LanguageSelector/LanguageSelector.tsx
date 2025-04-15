@@ -1,53 +1,91 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useLanguage } from "../../contexts/LanguageContext";
+import { useTranslation } from "../../hooks/useTranslation";
+import { Language } from "../../types/index";
 
 const LanguageSelector = () => {
-  const { language, setLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage()
+  const { t } = useTranslation();
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const languages = [
+    { code: "fr" as Language, name: "Français", flag: "🇫🇷" },
+    { code: "en" as Language, name: "English", flag: "🇺🇸" },
+    { code: "es" as Language, name: "Español", flag: "🇪🇸" },
+    { code: "de" as Language, name: "Deutsch", flag: "🇩🇪" },
+    { code: "pt" as Language, name: "Português Br", flag: "🇧🇷" },
+    { code: "zh" as Language, name: "中文", flag: "🇨🇳" },
+    { code: "ja" as Language, name: "日本語", flag: "🇯🇵" },
+  ];
+
+  const currentLanguage = languages.find(lang => lang.code === language);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
-    <div className="flex items-center gap-1">
+    <div 
+      className="relative"
+      ref={dropdownRef}
+    >
       <button
-        onClick={() => setLanguage("fr")}
-        className={`p-1 rounded-md transition-colors ${
-          language === "fr" ? "bg-blue-100" : "hover:bg-gray-100"
-        }`}
-        aria-label="Français"
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center gap-2 px-2 py-1 rounded-md bg-white hover:bg-gray-50 border border-gray-200 transition-colors"
+        aria-haspopup="listbox"
+        aria-expanded={isOpen}
+        aria-label={t("common.languageSelector")}
       >
+        <span className="text-lg">{currentLanguage?.flag}</span>
+        <span className="text-sm font-medium capitalize">{currentLanguage?.code}</span>
         <svg
-          className="w-5 h-5"
-          viewBox="0 0 640 480"
-          xmlns="http://www.w3.org/2000/svg"
+          className={`w-4 h-4 transition-transform ${isOpen ? "rotate-180" : ""}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
         >
-          <path fill="#fff" d="M0 0h640v480H0z" />
-          <path fill="#00267f" d="M0 0h213.3v480H0z" />
-          <path fill="#f31830" d="M426.7 0H640v480H426.7z" />
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
         </svg>
       </button>
-      <button
-        onClick={() => setLanguage("en")}
-        className={`p-1 rounded-md transition-colors ${
-          language === "en" ? "bg-blue-100" : "hover:bg-gray-100"
-        }`}
-        aria-label="English"
-      >
-        <svg
-          className="w-5 h-5"
-          viewBox="0 0 640 480"
-          xmlns="http://www.w3.org/2000/svg"
+
+      {isOpen && (
+        <div
+          className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white border border-gray-200 z-50"
+          role="listbox"
+          aria-label={t("common.languageSelector")}
         >
-          <path fill="#012169" d="M0 0h640v480H0z" />
-          <path
-            fill="#fff"
-            d="m75 0 244 181L562 0h78v62L400 241l240 178v61h-80L320 301 81 480H0v-60l239-178L0 64V0h75z"
-          />
-          <path
-            fill="#c8102e"
-            d="m424 281 216 159v40L369 281h55zm-184 20 6 35L54 480H0l240-179zM640 0v3L391 191l2-44L590 0h50zM0 0l239 176h-60L0 42V0z"
-          />
-          <path fill="#fff" d="M241 0v480h160V0H241zM0 160v160h640V160H0z" />
-          <path fill="#c8102e" d="M0 193v96h640v-96H0zM273 0v480h96V0h-96z" />
-        </svg>
-      </button>
+          {languages.map((lang) => (
+            <button
+              key={lang.code}
+              onClick={() => {
+                setLanguage(lang.code);
+                setIsOpen(false);
+              }}
+              className={`flex items-center gap-2 w-full px-4 py-2 text-sm text-left hover:bg-gray-50 ${
+                language === lang.code ? "bg-blue-50" : ""
+              }`}
+              role="option"
+              aria-selected={language === lang.code}
+            >
+              <span className="text-lg">{lang.flag}</span>
+              <span className="font-medium">{lang.name}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -1,11 +1,16 @@
 import React from "react";
 import { Bus } from "../../types";
+import { useTranslation } from "../../hooks/useTranslation";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 interface StatusDateProps {
   bus: Bus;
 }
 
 const StatusDate = ({ bus }: StatusDateProps) => {
+  const { t } = useTranslation();
+  const { language } = useLanguage();
+
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const tomorrow = new Date(today);
@@ -23,26 +28,23 @@ const StatusDate = ({ bus }: StatusDateProps) => {
   // Déterminer le texte pour la date
   let dateText = "";
   if (busDay.getTime() === today.getTime()) {
-    dateText = "aujourd'hui";
+    return null; // Ne pas afficher la date si c'est aujourd'hui
   } else if (busDay.getTime() === tomorrow.getTime()) {
-    dateText = "demain";
+    dateText = t("common.tomorrow");
   } else if (busDay.getTime() === yesterday.getTime()) {
-    dateText = "hier";
+    dateText = t("common.yesterday");
   } else {
-    // Format de date comme "Lun. 15 avr."
-    dateText = busDate.toLocaleDateString("fr-FR", {
+    dateText = busDate.toLocaleDateString(language === 'fr' ? 'fr-FR' : 'en-GB', {
       weekday: "short",
       day: "numeric",
       month: "short",
     });
   }
 
-  if (dateText === "aujourd'hui") {
-    return null;
-  }
-
   return (
-    <div className={`text-sm px-3 py-1 rounded-full text-black ${dateText === "hier" ? "bg-purple-400" : "bg-yellow-400"}`}>
+    <div className={`text-sm px-3 py-1 rounded-full text-black ${
+      dateText === "hier" ? "bg-purple-400" : "bg-yellow-400"
+    }`}>
       {dateText}
     </div>
   );

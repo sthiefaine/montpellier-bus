@@ -1,80 +1,116 @@
 import React from "react";
 import { StatusType } from "../../types";
+import { useTranslation } from "../../hooks/useTranslation";
 
 interface StatusBadgeProps {
   status: StatusType;
   delayMinutes?: number;
 }
 
-const StatusBadge = ({ status, delayMinutes = 0 }: StatusBadgeProps) => {
-  let backgroundColor = "";
-  let textColor = "";
-  let statusText = "";
-  let delayText = "";
+const StatusBadge = ({ status, delayMinutes }: StatusBadgeProps) => {
+  const { t } = useTranslation();
 
-  const formatDelay = (minutes: number): string => {
-    if (minutes < 60) {
-      return `${minutes}min`;
-    } else {
-      const hours = Math.floor(minutes / 60);
-      const remainingMinutes = minutes % 60;
-      return remainingMinutes > 0
-        ? `${hours}h${remainingMinutes}min`
-        : `${hours}h`;
+  const getStatusColor = () => {
+    switch (status) {
+      case "ON_TIME":
+        return "bg-green-100 text-green-800";
+      case "LATE":
+        return "bg-red-100 text-red-800";
+      case "EARLY":
+        return "bg-blue-100 text-blue-800";
+      case "CANCELLED":
+        return "bg-red-600 text-white";
+      case "PASSED":
+        return "bg-gray-200 text-gray-600";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
 
-  switch (status) {
-    case "ON_TIME":
-      backgroundColor = "bg-green-100";
-      textColor = "text-green-800";
-      statusText = "À l'heure";
-      break;
-    case "LATE":
-      backgroundColor = "bg-red-100";
-      textColor = "text-red-800";
-      statusText = "Retard";
-      if (delayMinutes) {
-        delayText = formatDelay(delayMinutes);
+  const formatDelay = (minutes: number): string => {
+    if (minutes >= 60) {
+      const hours = Math.floor(minutes / 60);
+      const remainingMinutes = minutes % 60;
+      if (hours === 1) {
+        if (remainingMinutes === 1) {
+          return `${hours}h${remainingMinutes}${t("bus.delay.minute")}`;
+        }
+        return `${hours}h${
+          remainingMinutes > 0
+            ? `${remainingMinutes}${t("bus.delay.minutes")}`
+            : ""
+        }`;
+      } else {
+        if (remainingMinutes === 1) {
+          return `${hours}h${remainingMinutes}${t("bus.delay.minute")}`;
+        }
+        return `${hours}h${
+          remainingMinutes > 0
+            ? `${remainingMinutes}${t("bus.delay.minutes")}`
+            : ""
+        }`;
       }
-      break;
-    case "EARLY":
-      backgroundColor = "bg-blue-100";
-      textColor = "text-blue-800";
-      statusText = "Avance";
-      if (delayMinutes) {
-        delayText = formatDelay(Math.abs(delayMinutes));
-      }
-      break;
-    case "CANCELLED":
-      backgroundColor = "bg-red-600";
-      textColor = "text-white";
-      statusText = "Annulé";
-      break;
-    case "PASSED":
-      backgroundColor = "bg-gray-200";
-      textColor = "text-gray-600";
-      statusText = "Passé";
-      break;
-    default:
-      backgroundColor = "bg-gray-100";
-      textColor = "text-gray-800";
-      statusText = "Programmé";
-  }
+    }
+    if (minutes === 1) {
+      return `${minutes}${t("bus.delay.minute")}`;
+    }
+    return `${minutes}${t("bus.delay.minutes")}`;
+  };
+
+  const getStatusText = () => {
+    switch (status) {
+      case "ON_TIME":
+        return t("bus.status.onTime");
+      case "LATE":
+        return delayMinutes
+          ? `${t("bus.delay.late")} ${formatDelay(Math.abs(delayMinutes))}`
+          : t("bus.status.delayed");
+      case "EARLY":
+        return delayMinutes
+          ? `${t("bus.delay.early")} ${formatDelay(Math.abs(delayMinutes))}`
+          : t("bus.status.delayed");
+      case "CANCELLED":
+        return t("bus.status.cancelled");
+      case "PASSED":
+        return t("bus.status.passed");
+      case "UNKNOWN":
+        return t("bus.status.programmed");
+      default:
+        return t("bus.status.programmed");
+    }
+  };
+
+  const getStatusDescription = () => {
+    switch (status) {
+      case "ON_TIME":
+        return t("bus.status.description.onTime");
+      case "LATE":
+        return delayMinutes
+          ? t("bus.status.description.late", { minutes: Math.abs(delayMinutes) })
+          : t("bus.status.description.delayed");
+      case "EARLY":
+        return delayMinutes
+          ? t("bus.status.description.early", { minutes: Math.abs(delayMinutes) })
+          : t("bus.status.description.early");
+      case "CANCELLED":
+        return t("bus.status.description.cancelled");
+      case "PASSED":
+        return t("bus.status.description.passed");
+      case "UNKNOWN":
+        return t("bus.status.description.unknown");
+      default:
+        return t("bus.status.description.unknown");
+    }
+  };
 
   return (
     <span
-      className={`px-2 py-1 rounded-full text-xs font-medium ${backgroundColor} ${textColor}`}
+      role="status"
+      aria-live="polite"
+      aria-label={getStatusDescription()}
+      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}
     >
-      {delayText && delayMinutes >= 60 ? (
-        <div className="flex flex-col items-center text-center">
-          <span>{statusText} {delayText}</span>
-        </div>
-      ) : (
-        <span>
-          {statusText} {delayText}
-        </span>
-      )}
+      {getStatusText()}
     </span>
   );
 };

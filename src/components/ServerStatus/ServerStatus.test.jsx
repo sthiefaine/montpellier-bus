@@ -6,6 +6,25 @@ import { ServerStatusEnum } from "../../types";
 vi.mock("../../hooks/useOnlineStatus", () => ({
   default: vi.fn(() => true),
 }));
+vi.mock("../../hooks/useTranslation", () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      const translations = {
+        "server.status.connected": "Connecté",
+        "server.status.disconnected": "Déconnecté",
+        "server.status.loading": "Connexion...",
+        "server.status.updating": "Mise à jour...",
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+vi.mock("../../contexts/LanguageContext", () => ({
+  useLanguage: () => ({
+    language: "fr",
+    setLanguage: vi.fn(),
+  }),
+}));
 
 import useOnlineStatus from "../../hooks/useOnlineStatus";
 
@@ -77,9 +96,9 @@ describe("ServerStatus Component", () => {
       />
     );
 
-    expect(screen.getByText("Hors ligne")).toBeInTheDocument();
+    expect(screen.getByText("Déconnecté")).toBeInTheDocument();
 
-    const indicator = screen.getByText("Hors ligne").previousSibling;
+    const indicator = screen.getByText("Déconnecté").previousSibling;
     expect(indicator).toHaveClass("bg-orange-500");
     useOnlineStatus.mockReturnValue(true);
   });

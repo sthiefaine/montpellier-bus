@@ -3,6 +3,30 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import StopsVisualizer from "./StopsVisualizer";
 
+vi.mock("../../hooks/useTranslation", () => ({
+  useTranslation: () => ({
+    t: (key) => {
+      const translations = {
+        "bus.stops.label": "Arrêts du bus",
+        "bus.stops.description": "Liste des {{total}} arrêts du bus",
+        "bus.stops.visualizer": "Visualisation des arrêts du bus",
+        "bus.stops.selected": "Arrêt sélectionné : {{stop}}",
+        "bus.stops.departure": "Départ : {{stop}}",
+        "bus.stops.terminus": "Terminus : {{stop}}",
+        "bus.stops.intermediate": "Arrêt {{position}} sur {{total}} : {{stop}}",
+        "bus.stops.current": "Arrêt actuel {{position}} sur {{total}} : {{stop}}",
+      };
+      return translations[key] || key;
+    },
+  }),
+}));
+vi.mock("../../contexts/LanguageContext", () => ({
+  useLanguage: () => ({
+    language: "fr",
+    setLanguage: vi.fn(),
+  }),
+}));
+
 describe("StopsVisualizer Component", () => {
   const mockStops = [
     {

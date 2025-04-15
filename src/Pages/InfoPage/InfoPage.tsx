@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import Header from "../../components/Header/Header";
 import { useTranslation } from "../../hooks/useTranslation";
@@ -7,10 +7,6 @@ import LanguageSelector from "../../components/LanguageSelector/LanguageSelector
 const InfoPage = () => {
   const { t } = useTranslation();
   const [selectedTab, setSelectedTab] = useState("all");
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
 
   const tabs = [
     { id: "all", label: t("info.titles.short.all"), ariaLabel: t("info.titles.all"), color: "#3B82F6" },

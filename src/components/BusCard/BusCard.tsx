@@ -7,6 +7,7 @@ import StatusDate from "../StatusDate/StatusDate";
 import BusIdentifier from "../BusIdentifier/BusIdentifier";
 import StopsVisualizer from "../StopsVisualizer/StopsVisualizer";
 import NumberFlow from "@number-flow/react";
+import { useTranslation } from "../../hooks/useTranslation";
 
 interface BusCardProps {
   bus: Bus;
@@ -14,8 +15,11 @@ interface BusCardProps {
 }
 
 const BusCard = ({ bus, stops }: BusCardProps) => {
+  const { t } = useTranslation();
   const terminusStop =
-    stops && stops.length > 0 ? stops[stops.length - 1].stop.name : "Inconnu";
+    stops && stops.length > 0
+      ? stops[stops.length - 1].stop.name
+      : t("bus.terminus");
 
   const alreadyPassed = bus.delayedDateISO
     ? new Date(bus.delayedDateISO) < new Date()
@@ -58,6 +62,8 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
 
   return (
     <div
+      role="article"
+      aria-label={t("bus.card.label", { id: bus.id, terminus: terminusStop })}
       className={`rounded-lg overflow-hidden shadow-sm ${
         alreadyPassed || busStatus === "CANCELLED" ? "opacity-70" : ""
       } ${cardBackgroundColor}`}
@@ -66,7 +72,11 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
         <div className="flex justify-between items-center">
           <StatusBadge status={busStatus} delayMinutes={bus.delayMinutes} />
 
-          <div className="flex items-center gap-2">
+          <div
+            className="flex items-center gap-2"
+            role="group"
+            aria-label={t("bus.times.label")}
+          >
             <StatusDate bus={bus} />
             <StatusTime bus={bus} />
           </div>
@@ -79,7 +89,11 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
 
           <div className="flex flex-col w-full text-left">
             <div className="mb-1">
-              <span className="text-base font-bold text-gray-800 line-clamp-1">
+              <span
+                className="text-base font-bold text-gray-800 line-clamp-1"
+                role="heading"
+                aria-level={2}
+              >
                 {terminusStop}
               </span>
             </div>
@@ -90,6 +104,13 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
                   className={` rounded-md line-clamp-1 ${
                     alreadyPassed ? "text-blue-300" : "text-blue-500"
                   }`}
+                  role="status"
+                  aria-live="polite"
+                  aria-label={t("bus.currentStopInfo.label", {
+                    current: currentIndex + 1,
+                    total: totalStops,
+                    stop: currentStop.stop.name,
+                  })}
                 >
                   {
                     <NumberFlow
@@ -105,7 +126,14 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
           </div>
         </div>
 
-        <div>
+        <div
+          role="region"
+          aria-label={t("bus.stops.label")}
+          aria-describedby="stops-description"
+        >
+          <div id="stops-description" className="sr-only">
+            {t("bus.stops.description", { total: totalStops })}
+          </div>
           <StopsVisualizer
             stops={stops}
             currentIndex={currentIndex}

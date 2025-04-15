@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../hooks/useTranslation';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const Header = () => {
-
+  const { t } = useTranslation();
+  const { language } = useLanguage();
   const [localTime, setLocalTime] = useState<Date>(new Date());
 
   useEffect(() => {
@@ -12,12 +15,31 @@ const Header = () => {
     return () => clearInterval(timer);
   }, []);
 
-  const formattedTime = localTime.toLocaleTimeString('fr-FR', {
+  const getLocale = () => {
+    switch (language) {
+      case 'fr':
+        return 'fr-FR';
+      case 'es':
+        return 'es-ES';
+      case 'de':
+        return 'de-DE';
+      case 'pt':
+        return 'pt-BR';
+      case 'zh':
+        return 'zh-CN';
+      case 'ja':
+        return 'ja-JP';
+      default:
+        return 'en-GB';
+    }
+  };
+
+  const formattedTime = localTime.toLocaleTimeString(getLocale(), {
     hour: '2-digit',
     minute: '2-digit'
   });
 
-  const formattedDate = localTime.toLocaleDateString('fr-FR', {
+  const formattedDate = localTime.toLocaleDateString(getLocale(), {
     weekday: 'long',
     day: 'numeric',
     month: 'long'
@@ -32,7 +54,7 @@ const Header = () => {
             <p className="text-s capitalize">{formattedDate}</p>
           </div>
           <div className="text-right">
-            <p className="text-s">Heure :</p>
+            <p className="text-s">{t("common.time")} :</p>
             <div className="text-xl font-bold">{formattedTime}</div>
           </div>
         </div>

@@ -21,6 +21,7 @@ import InfoPage from "./components/InfoPage/InfoPage";
 import "./App.css";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import LanguageSelector from "./components/LanguageSelector/LanguageSelector";
+import { useTranslation } from "./hooks/useTranslation";
 
 const App = () => {
   const [busSchedules, setBusSchedules] = useState<Bus[]>([]);
@@ -45,6 +46,8 @@ const App = () => {
     filteredBusSchedules,
     loading
   );
+
+  const { t } = useTranslation();
 
   useEffect(() => {
     const { buses, timestamp } = BusStorage.loadBusSchedules();
@@ -189,15 +192,23 @@ const App = () => {
   return (
     <LanguageProvider>
       <Router>
-        <div className="flex flex-col items-center min-h-screen bg-gray-100 pb-6">
+        <div 
+          className="flex flex-col items-center min-h-screen bg-gray-100 pb-6"
+          role="main"
+          aria-label={t("common.appName")}
+        >
           <Routes>
             <Route
               path="/"
               element={
                 <>
                   <Header />
-                  <div className="fixed top-18 left-0 right-0 z-10 w-full bg-white shadow-md">
-                    <div className="w-full mx-auto py-2 px-2 flex gap-4 justify-between">
+                  <div 
+                    className="fixed top-18 left-0 right-0 z-10 w-full bg-white shadow-md"
+                    role="navigation"
+                    aria-label={t("common.navigation")}
+                  >
+                    <div className="w-full mx-auto py-1 px-2 flex gap-4 justify-between">
                       <CompanyFilter
                         companies={COMPANIES}
                         selectedCompany={selectedCompany}
@@ -210,10 +221,14 @@ const App = () => {
                   <div className="pt-30"></div>
 
                   {firstActiveBusIndex > 0 && filteredBusSchedules.length > 0 && (
-                    <div className="w-full max-w-2xl mx-auto px-2 mb-2 mt-2">
+                    <div 
+                      className="w-full max-w-2xl mx-auto px-2 mb-2 mt-2"
+                      role="region"
+                      aria-label={t("bus.alreadyPassed")}
+                    >
                       <div className="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-md flex justify-between items-center">
                         <p className="text-blue-700 text-sm">
-                          {firstActiveBusIndex} bus déjà passés
+                          {firstActiveBusIndex} {t("bus.alreadyPassed")}
                         </p>
                         <button
                           className="text-xs text-blue-600 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full capitalize"
@@ -231,8 +246,9 @@ const App = () => {
                               });
                             }
                           }}
+                          aria-label={t("bus.scroll")}
                         >
-                          défiler
+                          {t("bus.scroll")}
                         </button>
                       </div>
                     </div>
@@ -241,12 +257,18 @@ const App = () => {
                   <div
                     ref={scrollContainerRef}
                     className="w-full max-w-2xl mx-auto p-2 mb-8"
+                    role="region"
+                    aria-label={t("bus.times.label")}
                   >
                     <>
                       {loading && busSchedules.length === 0 && <LoadingSpinner />}
 
                       {error && busSchedules.length === 0 && (
-                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                        <div 
+                          className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md"
+                          role="alert"
+                          aria-live="assertive"
+                        >
                           <p className="text-red-700">{error}</p>
                         </div>
                       )}
@@ -255,15 +277,23 @@ const App = () => {
                         !loading &&
                         busSchedules.length === 0 &&
                         !error && (
-                          <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md">
+                          <div 
+                            className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md"
+                            role="status"
+                            aria-live="polite"
+                          >
                             <p className="text-yellow-700">
-                              Aucun bus disponible pour le moment.
+                              {t("bus.noBusAvailable")}
                             </p>
                           </div>
                         )}
 
                       {filteredBusSchedules.length > 0 && (
-                        <div className="space-y-2">
+                        <div 
+                          className="space-y-2"
+                          role="list"
+                          aria-label={t("bus.times.label")}
+                        >
                           {filteredBusSchedules.map((bus, index) => (
                             <div
                               key={bus.id + bus.scheduledTime + bus.company}
@@ -272,6 +302,7 @@ const App = () => {
                                   busRefs.current[index] = el;
                                 }
                               }}
+                              role="listitem"
                             >
                               <BusCard bus={bus} stops={bus.calls} />
                             </div>

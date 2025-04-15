@@ -1,6 +1,7 @@
 import React from "react";
 import { ServerStatusEnum } from "../../types";
 import useOnlineStatus from "../../hooks/useOnlineStatus";
+import { useTranslation } from "../../hooks/useTranslation";
 
 interface ServerStatusProps {
   className?: string;
@@ -14,13 +15,14 @@ const ServerStatus = ({
   isRefreshing = false,
 }: ServerStatusProps) => {
   const isOnline = useOnlineStatus();
+  const { t } = useTranslation();
 
   const getStatus = () => {
     if (!isOnline) {
       return {
         color: "bg-orange-500",
         animate: "",
-        text: "Hors ligne",
+        text: t("server.status.disconnected"),
       };
     }
 
@@ -28,7 +30,7 @@ const ServerStatus = ({
       return {
         color: "bg-blue-500",
         animate: "animate-pulse",
-        text: "Mise à jour...",
+        text: t("server.status.updating"),
       };
     }
 
@@ -37,19 +39,19 @@ const ServerStatus = ({
         return {
           color: "bg-green-500",
           animate: "",
-          text: "Connecté",
+          text: t("server.status.connected"),
         };
       case ServerStatusEnum.DISCONNECTED:
         return {
           color: "bg-red-500",
           animate: "",
-          text: "Déconnecté",
+          text: t("server.status.disconnected"),
         };
       default:
         return {
           color: "bg-yellow-500",
           animate: "animate-pulse",
-          text: "Connexion...",
+          text: t("server.status.loading"),
         };
     }
   };
