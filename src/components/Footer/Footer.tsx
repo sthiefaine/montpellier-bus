@@ -2,6 +2,7 @@ import React from "react";
 import { formatTimeHHMM } from "../../helpers/utils";
 import ServerStatus from "../ServerStatus/ServerStatus";
 import { ServerStatusEnum } from "../../types";
+import { Link } from "react-router-dom";
 
 interface FooterProps {
   currentTime: Date;
@@ -50,6 +51,12 @@ const Footer = ({
           Mise à jour: {formatTimeHHMM(currentTime)}
           {!isOnline && cacheTimestamp && ` (Cache ${getCacheAgeDisplay()})`}
         </div>
+        <Link
+          to="/infos"
+          className="text-blue-600 hover:text-blue-800"
+        >
+          Infos
+        </Link>
       </div>
     </div>
   );
