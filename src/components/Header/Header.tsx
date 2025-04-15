@@ -46,20 +46,36 @@ const Header = () => {
   });
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-10 w-full bg-blue-600 text-white shadow-md">
+    <header 
+      className="fixed top-0 left-0 right-0 z-10 w-full bg-blue-600 text-white shadow-md"
+      role="banner"
+    >
       <div className="max-w-2xl mx-auto px-4 py-2">
         <div className="flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold">Montpellier Sabines</h1>
-            <p className="text-s capitalize">{formattedDate}</p>
+          <div tabIndex={0}>
+            <h1 className="text-2xl font-bold" role="heading" aria-level={1}>
+              Montpellier Sabines
+            </h1>
+            <p 
+              className="text-s capitalize" 
+              role="contentinfo"
+              aria-label={t("common.today")}
+            >
+              {formattedDate}
+            </p>
           </div>
-          <div className="text-right">
+          <div 
+            className="text-right"
+            tabIndex={0}
+            role="timer"
+            aria-label={`${t("common.time")} ${formattedTime}`}
+          >
             <p className="text-s">{t("common.time")} :</p>
             <div className="text-xl font-bold">{formattedTime}</div>
           </div>
         </div>
       </div>
-    </div>
+    </header>
   );
 };
 

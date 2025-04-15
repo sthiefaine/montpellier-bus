@@ -29,6 +29,7 @@ const CompanyFilter = ({
           aria-checked={selectedCompany === company.id}
           aria-label={t("company.filter.button", { company: t(`company.${company.id.toLowerCase()}`) })}
           style={{
+            minWidth: "65px",
             backgroundColor:
               selectedCompany === company.id ? company.color : "white",
             borderColor: company.color,

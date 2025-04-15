@@ -8,6 +8,7 @@ interface StopsVisualizerProps {
   alreadyPassed?: boolean;
   busStatus?: StatusType;
   onStopClick?: (index: number) => void;
+  onKeyDown?: (event: React.KeyboardEvent, index: number) => void;
 }
 
 const StopsVisualizer = ({
@@ -16,6 +17,7 @@ const StopsVisualizer = ({
   alreadyPassed = false,
   busStatus = "ON_TIME",
   onStopClick = () => {},
+  onKeyDown = () => {},
 }: StopsVisualizerProps) => {
   const { t } = useTranslation();
   const ref = useRef<HTMLDivElement>(null);
@@ -119,14 +121,16 @@ const StopsVisualizer = ({
             role="listitem"
           >
             <button
-              className={`rounded-full ${pointColor} ${pointSize} ${animation} cursor-pointer`}
+              className={`rounded-full ${pointColor} ${pointSize} ${animation} cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
               style={{
                 willChange: animation ? "opacity" : "auto",
                 contain: "layout style paint",
               }}
               onClick={() => onStopClick(index)}
+              onKeyDown={(e) => onKeyDown(e, index)}
               aria-label={ariaLabel}
               aria-current={index === currentIndex ? "step" : undefined}
+              tabIndex={0}
             ></button>
           </div>
         ))}

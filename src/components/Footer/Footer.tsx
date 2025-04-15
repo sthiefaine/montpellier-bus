@@ -44,19 +44,25 @@ const Footer = ({
 
   return (
     <div className="fixed bottom-0 left-0 right-0 bg-white bg-opacity-80 backdrop-blur-sm border-t border-gray-200 py-2 px-2 text-center text-xs text-gray-500 z-10">
-      <div className="flex justify-between items-center max-w-2xl mx-auto px-2">
-        <ServerStatus
-          serverStatus={serverStatus}
-          isRefreshing={isRefreshing}
-          className="text-xs"
-        />
-        <div>
-          {formatTimeHHMM(currentTime)}
-          {!isOnline && cacheTimestamp && ` (${t("common.cache")} ${getCacheAgeDisplay()})`}
+      <div className="max-w-2xl mx-auto px-2">
+        <div className="grid grid-cols-3 items-center">
+          <div className="flex justify-start">
+            <ServerStatus
+              serverStatus={serverStatus}
+              isRefreshing={isRefreshing}
+              className="text-xs"
+            />
+          </div>
+          <div className="text-center">
+            {formatTimeHHMM(currentTime)}
+            {!isOnline && cacheTimestamp && ` (${t("common.cache")} ${getCacheAgeDisplay()})`}
+          </div>
+          <div className="flex justify-end">
+            <Link to="/infos" className="text-blue-600 hover:text-blue-800">
+              {t("common.info")}
+            </Link>
+          </div>
         </div>
-        <Link to="/infos" className="text-blue-600 hover:text-blue-800">
-          {t("common.info")}
-        </Link>
       </div>
     </div>
   );
