@@ -86,39 +86,64 @@ const App = () => {
           );
         }
 
-        const [serverStatusCheck, data, dataBlablabus] = await Promise.all([
+        const [serverStatusResult, flixbusResult, blablabusResult] = await Promise.allSettled([
           checkServerStatusAction(),
           fetchBusData(),
           fetchBusDataBlablabus(),
         ]);
 
-        const formattedBuses = formatBusData(data.rides, true);
-        const formattedBusesBlablabus = formatBusData(dataBlablabus.rides);
+        let allBuses: Bus[] = [];
+        let hasError = false;
+        let errorMessages: string[] = [];
 
-        const allBuses = [...formattedBuses, ...formattedBusesBlablabus];
+        if (serverStatusResult.status === 'fulfilled') {
+          setServerStatus(
+            serverStatusResult.value
+              ? ServerStatusEnum.CONNECTED
+              : ServerStatusEnum.DISCONNECTED
+          );
+        } else {
+          setServerStatus(ServerStatusEnum.DISCONNECTED);
+          errorMessages.push("Erreur de connexion au serveur");
+        }
+
+        if (flixbusResult.status === 'fulfilled') {
+          const formattedBuses = formatBusData(flixbusResult.value.rides, true);
+          allBuses = [...allBuses, ...formattedBuses];
+        } else {
+          hasError = true;
+          errorMessages.push("Erreur lors de la récupération des horaires FlixBus");
+        }
+
+        if (blablabusResult.status === 'fulfilled') {
+          const formattedBusesBlablabus = formatBusData(blablabusResult.value.rides);
+          allBuses = [...allBuses, ...formattedBusesBlablabus];
+        } else {
+          hasError = true;
+          errorMessages.push("Erreur lors de la récupération des horaires Blablabus");
+        }
+
         if (allBuses.length > 0) {
           lastSuccessfulBusSchedules.current = allBuses;
           BusStorage.saveBusSchedules(allBuses);
           setCacheTimestamp(new Date());
+
+          startTransition(() => {
+            setBusSchedules(allBuses);
+            const filteredAndSortedBuses = filterAndSortBuses(
+              allBuses,
+              selectedCompany
+            );
+            setFilteredBusSchedules(filteredAndSortedBuses);
+          });
         }
 
-        startTransition(() => {
-          setBusSchedules(allBuses);
+        if (hasError) {
+          setError(errorMessages.join(". "));
+        } else {
+          setError(null);
+        }
 
-          const filteredAndSortedBuses = filterAndSortBuses(
-            allBuses,
-            selectedCompany
-          );
-
-          setFilteredBusSchedules(filteredAndSortedBuses);
-        });
-
-        setServerStatus(
-          serverStatusCheck
-            ? ServerStatusEnum.CONNECTED
-            : ServerStatusEnum.DISCONNECTED
-        );
-        setError(null);
       } catch (err) {
         const errorMessage = !isOnline
           ? "Vous êtes hors ligne. Affichage des données en cache."
