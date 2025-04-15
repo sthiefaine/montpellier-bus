@@ -17,9 +17,10 @@ import BusStorage from "./utils/busStorage";
 import useOnlineStatus from "./hooks/useOnlineStatus";
 import Footer from "./components/Footer/Footer";
 import useAutoScroll from "./hooks/useAutoScroll";
-import ServerStatus from "./components/ServerStatus/ServerStatus";
 import InfoPage from "./components/InfoPage/InfoPage";
 import "./App.css";
+import { LanguageProvider } from "./contexts/LanguageContext";
+import LanguageSelector from "./components/LanguageSelector/LanguageSelector";
 
 const App = () => {
   const [busSchedules, setBusSchedules] = useState<Bus[]>([]);
@@ -186,112 +187,115 @@ const App = () => {
   };
 
   return (
-    <Router>
-      <div className="flex flex-col items-center min-h-screen bg-gray-100 pb-6">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <>
-                <Header />
-                <div className="fixed top-18 left-0 right-0 z-10 w-full bg-white shadow-md">
-                  <div className="w-full mx-auto py-2 px-2 flex gap-4">
-                    <CompanyFilter
-                      companies={COMPANIES}
-                      selectedCompany={selectedCompany}
-                      onSelectCompany={handleCompanySelect}
-                    />
-                  </div>
-                </div>
-
-                <div className="pt-30"></div>
-
-                {firstActiveBusIndex > 0 && filteredBusSchedules.length > 0 && (
-                  <div className="w-full max-w-2xl mx-auto px-2 mb-2 mt-2">
-                    <div className="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-md flex justify-between items-center">
-                      <p className="text-blue-700 text-sm">
-                        {firstActiveBusIndex} bus déjà passés
-                      </p>
-                      <button
-                        className="text-xs text-blue-600 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full capitalize"
-                        onClick={() => {
-                          if (busRefs.current[firstActiveBusIndex]) {
-                            const headerOffset = 140;
-                            const element = busRefs.current[firstActiveBusIndex];
-                            const offsetPosition =
-                              element!.getBoundingClientRect().top +
-                              window.screenY -
-                              headerOffset;
-                            window.scrollTo({
-                              top: offsetPosition,
-                              behavior: "smooth",
-                            });
-                          }
-                        }}
-                      >
-                        défiler
-                      </button>
+    <LanguageProvider>
+      <Router>
+        <div className="flex flex-col items-center min-h-screen bg-gray-100 pb-6">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <>
+                  <Header />
+                  <div className="fixed top-18 left-0 right-0 z-10 w-full bg-white shadow-md">
+                    <div className="w-full mx-auto py-2 px-2 flex gap-4 justify-between">
+                      <CompanyFilter
+                        companies={COMPANIES}
+                        selectedCompany={selectedCompany}
+                        onSelectCompany={handleCompanySelect}
+                      />
+                      <LanguageSelector />
                     </div>
                   </div>
-                )}
 
-                <div
-                  ref={scrollContainerRef}
-                  className="w-full max-w-2xl mx-auto p-2 mb-8"
-                >
-                  <>
-                    {loading && busSchedules.length === 0 && <LoadingSpinner />}
+                  <div className="pt-30"></div>
 
-                    {error && busSchedules.length === 0 && (
-                      <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
-                        <p className="text-red-700">{error}</p>
+                  {firstActiveBusIndex > 0 && filteredBusSchedules.length > 0 && (
+                    <div className="w-full max-w-2xl mx-auto px-2 mb-2 mt-2">
+                      <div className="bg-blue-50 border-l-4 border-blue-500 p-2 rounded-md flex justify-between items-center">
+                        <p className="text-blue-700 text-sm">
+                          {firstActiveBusIndex} bus déjà passés
+                        </p>
+                        <button
+                          className="text-xs text-blue-600 bg-blue-100 hover:bg-blue-200 px-2 py-1 rounded-full capitalize"
+                          onClick={() => {
+                            if (busRefs.current[firstActiveBusIndex]) {
+                              const headerOffset = 140;
+                              const element = busRefs.current[firstActiveBusIndex];
+                              const offsetPosition =
+                                element!.getBoundingClientRect().top +
+                                window.screenY -
+                                headerOffset;
+                              window.scrollTo({
+                                top: offsetPosition,
+                                behavior: "smooth",
+                              });
+                            }
+                          }}
+                        >
+                          défiler
+                        </button>
                       </div>
-                    )}
+                    </div>
+                  )}
 
-                    {filteredBusSchedules.length === 0 &&
-                      !loading &&
-                      busSchedules.length === 0 &&
-                      !error && (
-                        <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md">
-                          <p className="text-yellow-700">
-                            Aucun bus disponible pour le moment.
-                          </p>
+                  <div
+                    ref={scrollContainerRef}
+                    className="w-full max-w-2xl mx-auto p-2 mb-8"
+                  >
+                    <>
+                      {loading && busSchedules.length === 0 && <LoadingSpinner />}
+
+                      {error && busSchedules.length === 0 && (
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
+                          <p className="text-red-700">{error}</p>
                         </div>
                       )}
 
-                    {filteredBusSchedules.length > 0 && (
-                      <div className="space-y-2">
-                        {filteredBusSchedules.map((bus, index) => (
-                          <div
-                            key={bus.id + bus.scheduledTime + bus.company}
-                            ref={(el) => {
-                              if (el) {
-                                busRefs.current[index] = el;
-                              }
-                            }}
-                          >
-                            <BusCard bus={bus} stops={bus.calls} />
+                      {filteredBusSchedules.length === 0 &&
+                        !loading &&
+                        busSchedules.length === 0 &&
+                        !error && (
+                          <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-md">
+                            <p className="text-yellow-700">
+                              Aucun bus disponible pour le moment.
+                            </p>
                           </div>
-                        ))}
-                      </div>
-                    )}
-                  </>
-                </div>
-              </>
-            }
-          />
-          <Route path="/infos" element={<InfoPage />} />
-        </Routes>
+                        )}
 
-        <Footer
-          currentTime={currentTime}
-          isOnline={isOnline}
-          cacheTimestamp={cacheTimestamp}
-          serverStatus={serverStatus}
-          isRefreshing={isPending || refreshing}
-        />
-      </div>
-    </Router>
+                      {filteredBusSchedules.length > 0 && (
+                        <div className="space-y-2">
+                          {filteredBusSchedules.map((bus, index) => (
+                            <div
+                              key={bus.id + bus.scheduledTime + bus.company}
+                              ref={(el) => {
+                                if (el) {
+                                  busRefs.current[index] = el;
+                                }
+                              }}
+                            >
+                              <BusCard bus={bus} stops={bus.calls} />
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </>
+                  </div>
+                </>
+              }
+            />
+            <Route path="/infos" element={<InfoPage />} />
+          </Routes>
+
+          <Footer
+            currentTime={currentTime}
+            isOnline={isOnline}
+            cacheTimestamp={cacheTimestamp}
+            serverStatus={serverStatus}
+            isRefreshing={isPending || refreshing}
+          />
+        </div>
+      </Router>
+    </LanguageProvider>
   );
 };
 
