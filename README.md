@@ -2,7 +2,8 @@
 
 Interface utilisateur pour consulter les horaires de bus FlixBus et BlaBlaBus à la gare routière de Montpellier Sabines.
 
-![Aperçu de l'application](./public/montpellier-bus-v1.png)
+![Aperçu de l'application V2](./public/montpellier-bus-v2.jpg)
+![Aperçu de l'application V1](./public/montpellier-bus-v1.png)
 
 ## Fonctionnalités
 

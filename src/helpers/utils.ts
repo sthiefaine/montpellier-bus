@@ -16,7 +16,30 @@ export const getCompanyColor = (company: string | undefined): string => {
  * @returns Heure au format HH:MM
  */
 export const formatTimeHHMM = (date: Date): string => {
-  return date.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+  return date.toLocaleTimeString('us-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Paris'
+  });
+};
+
+/**
+ * Formatte une date en heure (HH:MM) avec un fuseau horaire spécifié
+ * @param date Date à formatter
+ * @param sourceTimezone Fuseau horaire source (par défaut, null)
+ * @returns Heure au format HH:MM
+ */
+
+export const formatTimeHHMMWithTZ = (date: Date, sourceTimezone: string | null = null): string => {
+  if (sourceTimezone) {
+    return date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      timeZone: 'Europe/Paris'
+    });
+  } else {
+    return formatTimeHHMM(date);
+  }
 };
 
 /**

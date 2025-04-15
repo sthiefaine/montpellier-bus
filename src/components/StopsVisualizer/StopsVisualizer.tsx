@@ -58,10 +58,10 @@ const StopsVisualizer = ({
         pointSize = "h-3 w-3";
         ariaLabel = t("bus.stops.terminus", { stop: stop.stop.name });
       } else {
-        ariaLabel = t("bus.stops.intermediate", { 
+        ariaLabel = t("bus.stops.intermediate", {
           stop: stop.stop.name,
           position: index + 1,
-          total: totalStops
+          total: totalStops,
         });
       }
 
@@ -72,10 +72,10 @@ const StopsVisualizer = ({
           index === 0 || index === totalStops - 1
             ? "h-3.5 w-3.5"
             : "h-2.5 w-2.5";
-        ariaLabel = t("bus.stops.current", { 
+        ariaLabel = t("bus.stops.current", {
           stop: stop.stop.name,
           position: index + 1,
-          total: totalStops
+          total: totalStops,
         });
       }
 
@@ -94,12 +94,12 @@ const StopsVisualizer = ({
     alreadyPassed,
     disableAnimation,
     totalStops,
-    t
+    t,
   ]);
 
   return (
-    <div 
-      className="relative w-full h-4" 
+    <div
+      className="relative w-full h-4"
       ref={ref}
       role="list"
       aria-label={t("bus.stops.visualizer")}
@@ -110,30 +110,32 @@ const StopsVisualizer = ({
         } w-full will-change-contents`}
         aria-hidden="true"
       ></div>
-      <div 
+      <div
         className="absolute top-0 left-0 w-full h-full flex justify-between items-center will-change-contents"
         role="list"
       >
-        {stopPoints.map(({ pointColor, pointSize, animation, ariaLabel, index }) => (
-          <div
-            key={index}
-            className="relative flex items-center justify-center"
-            role="listitem"
-          >
-            <button
-              className={`rounded-full ${pointColor} ${pointSize} ${animation} cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
-              style={{
-                willChange: animation ? "opacity" : "auto",
-                contain: "layout style paint",
-              }}
-              onClick={() => onStopClick(index)}
-              onKeyDown={(e) => onKeyDown(e, index)}
-              aria-label={ariaLabel}
-              aria-current={index === currentIndex ? "step" : undefined}
-              tabIndex={0}
-            ></button>
-          </div>
-        ))}
+        {stopPoints.map(
+          ({ pointColor, pointSize, animation, ariaLabel, index }) => (
+            <div
+              key={index}
+              className="relative flex items-center justify-center"
+              role="listitem"
+            >
+              <button
+                className={`rounded-full ${pointColor} ${pointSize} ${animation} cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                style={{
+                  willChange: animation ? "opacity" : "auto",
+                  contain: "layout style paint",
+                }}
+                onClick={() => onStopClick(index)}
+                onKeyDown={(e) => onKeyDown(e, index)}
+                aria-label={ariaLabel}
+                aria-current={index === currentIndex ? "step" : undefined}
+                tabIndex={0}
+              ></button>
+            </div>
+          )
+        )}
       </div>
     </div>
   );
