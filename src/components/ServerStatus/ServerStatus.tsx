@@ -59,7 +59,7 @@ const ServerStatus = ({
   return (
     <div className={`flex items-center ${className}`}>
       <div
-        className={`h-3 w-3 rounded-full mr-2 ${status.color} ${status.animate}`}
+        className={`h-2 w-2 rounded-full mr-1 ${status.color} ${status.animate}`}
       />
       <span className="text-xs font-medium">{status.text}</span>
     </div>

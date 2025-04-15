@@ -2,6 +2,7 @@ import { ApiResponse, Bus, RawBusData } from "../types";
 import { COMPANY_COLORS } from "../helpers/constants";
 import { formatTimeHHMM } from "../helpers/utils";
 
+// @ts-ignore
 const baseUrl = import.meta.env.DEV
   ? "http://localhost:5000"
   : "https://montpellier-bus-backend.vercel.app";

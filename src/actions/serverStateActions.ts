@@ -1,3 +1,5 @@
+
+// @ts-ignore
 const baseUrl = import.meta.env.DEV
   ? "http://localhost:5000"
   : "https://montpellier-bus-backend.vercel.app";

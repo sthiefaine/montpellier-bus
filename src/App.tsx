@@ -16,7 +16,7 @@ import BusStorage from "./utils/busStorage";
 import useOnlineStatus from "./hooks/useOnlineStatus";
 import Footer from "./components/Footer/Footer";
 import useAutoScroll from "./hooks/useAutoScroll";
-
+import ServerStatus from "./components/ServerStatus/ServerStatus";
 import "./App.css";
 
 const App = () => {
@@ -186,13 +186,15 @@ const App = () => {
   return (
     <div className="flex flex-col items-center min-h-screen bg-gray-100 pb-6">
       <Header />
-      <CompanyFilter
-        serverStatus={serverStatus}
-        companies={COMPANIES}
-        selectedCompany={selectedCompany}
-        onSelectCompany={handleCompanySelect}
-        isRefreshing={isPending || refreshing}
-      />
+      <div className="fixed top-18 left-0 right-0 z-10 w-full bg-white shadow-md">
+        <div className="w-full mx-auto py-2 px-2 flex gap-4">
+          <CompanyFilter
+            companies={COMPANIES}
+            selectedCompany={selectedCompany}
+            onSelectCompany={handleCompanySelect}
+          />
+        </div>
+      </div>
 
       <div className="pt-30"></div>
 
@@ -272,6 +274,8 @@ const App = () => {
         currentTime={currentTime}
         isOnline={isOnline}
         cacheTimestamp={cacheTimestamp}
+        serverStatus={serverStatus}
+        isRefreshing={isPending || refreshing}
       />
     </div>
   );
