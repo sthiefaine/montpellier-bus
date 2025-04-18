@@ -1,6 +1,5 @@
 export type Language = "fr" | "en" | "es" | "de" | "pt" | "zh" | "ja";
 
-
 export interface Stop {
   stop: {
     name: string;
@@ -26,9 +25,18 @@ export interface Bus {
   lineCode: string;
   destination: string;
   delayedTime?: string | null;
+  isTheoretical?: boolean;
 }
 
-export type StatusType = "ON_TIME" | "DELAYED" | "EARLY" | "CANCELLED" | "PASSED" | "UNKNOWN" | "PROGRAMMED" | "LATE";
+export type StatusType =
+  | "ON_TIME"
+  | "DELAYED"
+  | "EARLY"
+  | "CANCELLED"
+  | "PASSED"
+  | "UNKNOWN"
+  | "PROGRAMMED"
+  | "LATE";
 
 export enum ServerStatusEnum {
   CONNECTED = "CONNECTED",
@@ -64,6 +72,14 @@ export interface RawBusData {
     };
   };
   calls: Stop[];
+  theoretical_schedule: TheoreticalSchedule;
+}
+
+export interface TheoreticalSchedule {
+  is_theoretical: boolean;
+  source: "night_data" | null;
+  schedule_type: "THEORETICAL" | "REAL_TIME";
+  last_updated: string | null;
 }
 
 export interface ApiResponse {

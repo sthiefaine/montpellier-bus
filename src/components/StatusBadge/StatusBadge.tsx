@@ -5,12 +5,16 @@ import { useTranslation } from "../../hooks/useTranslation";
 interface StatusBadgeProps {
   status: StatusType;
   delayMinutes?: number;
+  isTheoretical?: boolean;
 }
 
-const StatusBadge = ({ status, delayMinutes }: StatusBadgeProps) => {
+const StatusBadge = ({ status, delayMinutes, isTheoretical }: StatusBadgeProps) => {
   const { t } = useTranslation();
 
   const getStatusColor = () => {
+    if (isTheoretical) {
+      return "bg-gray-100 text-gray-800";
+    }
     switch (status) {
       case "ON_TIME":
         return "bg-green-100 text-green-800";
@@ -58,6 +62,9 @@ const StatusBadge = ({ status, delayMinutes }: StatusBadgeProps) => {
   };
 
   const getStatusText = () => {
+    if (isTheoretical) {
+      return t("bus.status.programmed");
+    }
     switch (status) {
       case "ON_TIME":
         return t("bus.status.onTime");
@@ -81,6 +88,9 @@ const StatusBadge = ({ status, delayMinutes }: StatusBadgeProps) => {
   };
 
   const getStatusDescription = () => {
+    if (isTheoretical) {
+      return t("bus.status.description.programmed");
+    }
     switch (status) {
       case "ON_TIME":
         return t("bus.status.description.onTime");

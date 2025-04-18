@@ -79,7 +79,7 @@ const BusCard = ({ bus, stops }: BusCardProps) => {
       <div className="p-3">
         <div className="flex justify-between items-center">
           <div tabIndex={0} aria-label={t("bus.status.description." + busStatus.toLowerCase())}>
-            <StatusBadge status={busStatus} delayMinutes={bus.delayMinutes} />
+            <StatusBadge isTheoretical={bus.isTheoretical} status={busStatus} delayMinutes={bus.delayMinutes} />
           </div>
 
           <div
