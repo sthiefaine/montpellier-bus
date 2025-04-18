@@ -29,6 +29,8 @@ const Header = () => {
         return 'zh-CN';
       case 'ja':
         return 'ja-JP';
+      case 'ru':
+        return 'ru-RU';
       default:
         return 'en-GB';
     }

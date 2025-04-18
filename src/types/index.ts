@@ -1,4 +1,4 @@
-export type Language = "fr" | "en" | "es" | "de" | "pt" | "zh" | "ja";
+export type Language = "fr" | "en" | "es" | "de" | "pt" | "zh" | "ja" | "ru";
 
 export interface Stop {
   stop: {

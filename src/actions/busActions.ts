@@ -91,7 +91,7 @@ export const formatBusData = (
       delayedDateTime: delayedDateTime,
       scheduledDateISO: scheduledDateTime.toISOString(),
       delayedDateISO: delayedDateTime ? delayedDateTime.toISOString() : null,
-      isTheoretical: ride.theoretical_schedule.is_theoretical,
+      isTheoretical: ride?.theoretical_schedule?.is_theoretical || false,
     };
   });
 };
