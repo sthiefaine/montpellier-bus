@@ -1,11 +1,11 @@
-import React, { useState, useEffect, useRef, useTransition } from "react";
+import React, { useState, useEffect, useRef, useTransition, cache } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Bus, ServerStatusEnum } from "./types";
 import {
-  fetchBusData,
+  fetchBusDataCached,
   formatBusData,
   filterAndSortBuses,
-  fetchBusDataBlablabus,
+  fetchBusDataBlablabusCached,
 } from "./actions/busActions";
 import Header from "./components/Header/Header";
 import CompanyFilter from "./components/CompanyFilter/CompanyFilter";
@@ -24,6 +24,26 @@ import LanguageSelector from "./components/LanguageSelector/LanguageSelector";
 import { useTranslation } from "./hooks/useTranslation";
 
 const App = () => {
+  const cachedFetchBusData = cache(async () => {
+    return await fetchBusDataCached();
+  });
+
+  const cachedFetchBusDataBlablabus = cache(async () => {
+    return await fetchBusDataBlablabusCached();
+  });
+
+  const cachedCheckServerStatus = cache(async () => {
+    return await checkServerStatusAction();
+  });
+
+  const cachedFormatBusData = cache((rides: any[], isFlixBus: boolean) => {
+    return formatBusData(rides, isFlixBus);
+  });
+
+  const cachedFilterAndSortBuses = cache((buses: Bus[], companyFilter: string) => {
+    return filterAndSortBuses(buses, companyFilter);
+  });
+
   const [busSchedules, setBusSchedules] = useState<Bus[]>([]);
   const [filteredBusSchedules, setFilteredBusSchedules] = useState<Bus[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -54,7 +74,7 @@ const App = () => {
     if (buses.length > 0) {
       lastSuccessfulBusSchedules.current = buses;
       setBusSchedules(buses);
-      setFilteredBusSchedules(filterAndSortBuses(buses, selectedCompany));
+      setFilteredBusSchedules(cachedFilterAndSortBuses(buses, selectedCompany));
       setCacheTimestamp(timestamp);
 
       if (!isOnline) {
@@ -87,9 +107,9 @@ const App = () => {
         }
 
         const [serverStatusResult, flixbusResult, blablabusResult] = await Promise.allSettled([
-          checkServerStatusAction(),
-          fetchBusData(),
-          fetchBusDataBlablabus(),
+          cachedCheckServerStatus(),
+          cachedFetchBusData(),
+          cachedFetchBusDataBlablabus(),
         ]);
 
         let allBuses: Bus[] = [];
@@ -108,7 +128,7 @@ const App = () => {
         }
 
         if (flixbusResult.status === 'fulfilled') {
-          const formattedBuses = formatBusData(flixbusResult.value.rides, true);
+          const formattedBuses = cachedFormatBusData(flixbusResult.value.rides, true);
           allBuses = [...allBuses, ...formattedBuses];
         } else {
           hasError = true;
@@ -116,7 +136,7 @@ const App = () => {
         }
 
         if (blablabusResult.status === 'fulfilled') {
-          const formattedBusesBlablabus = formatBusData(blablabusResult.value.rides);
+          const formattedBusesBlablabus = cachedFormatBusData(blablabusResult.value.rides, false);
           allBuses = [...allBuses, ...formattedBusesBlablabus];
         } else {
           hasError = true;
@@ -130,7 +150,7 @@ const App = () => {
 
           startTransition(() => {
             setBusSchedules(allBuses);
-            const filteredAndSortedBuses = filterAndSortBuses(
+            const filteredAndSortedBuses = cachedFilterAndSortBuses(
               allBuses,
               selectedCompany
             );
@@ -164,7 +184,7 @@ const App = () => {
             startTransition(() => {
               setBusSchedules(lastSuccessfulBusSchedules.current);
               setFilteredBusSchedules(
-                filterAndSortBuses(
+                cachedFilterAndSortBuses(
                   lastSuccessfulBusSchedules.current,
                   selectedCompany
                 )
@@ -193,7 +213,7 @@ const App = () => {
     if (busSchedules.length > 0) {
       startTransition(() => {
         setFilteredBusSchedules(
-          filterAndSortBuses(busSchedules, selectedCompany)
+          cachedFilterAndSortBuses(busSchedules, selectedCompany)
         );
       });
     }
