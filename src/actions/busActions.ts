@@ -32,10 +32,8 @@ export const fetchBusData = async (): Promise<ApiResponse> => {
   return data;
 };
 
-// Version mise en cache de fetchBusData
 export const fetchBusDataCached = async (): Promise<ApiResponse> => {
   const cacheKey = createTimeBasedCacheKey("flixbus-data", 5);
-
   return await apiCache.getOrSet(cacheKey, () => fetchBusData(), 5);
 };
 

@@ -22,7 +22,6 @@ interface LanguageProviderProps {
 
 export const LanguageProvider = ({ children }: LanguageProviderProps) => {
   const [language, setLanguage] = useState<Language>(() => {
-    // Récupérer la langue sauvegardée ou utiliser le français par défaut
     const savedLanguage = localStorage.getItem("language");
     return (savedLanguage as Language) || "fr";
   });

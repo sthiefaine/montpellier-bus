@@ -24,12 +24,12 @@ class ApiCache {
     // Si pas en cache ou expiré, récupérer les données
     console.log(`Cache miss pour ${key}, récupération des données...`);
     const data = await fetchFn();
-    
+
     // Mettre en cache avec expiration
     this.cache.set(key, {
       data,
       timestamp: now,
-      expiry: expiryMinutes * 60 * 1000
+      expiry: expiryMinutes * 60 * 1000,
     });
 
     return data;
@@ -62,8 +62,11 @@ class ApiCache {
 export const apiCache = new ApiCache();
 
 // Fonction utilitaire pour créer une clé de cache basée sur le temps
-export const createTimeBasedCacheKey = (baseKey: string, intervalMinutes: number = 5): string => {
+export const createTimeBasedCacheKey = (
+  baseKey: string,
+  intervalMinutes: number = 5
+): string => {
   const now = new Date();
   const timeSlot = Math.floor(now.getTime() / (intervalMinutes * 60 * 1000));
   return `${baseKey}-${timeSlot}`;
-}; 
+};

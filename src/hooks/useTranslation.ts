@@ -6,6 +6,7 @@ import de from "../translations/locales/de";
 import pt from "../translations/locales/pt";
 import zh from "../translations/locales/zh";
 import ja from "../translations/locales/ja";
+import ru from "../translations/locales/ru";
 
 const translations = {
   fr,
@@ -15,6 +16,7 @@ const translations = {
   pt,
   zh,
   ja,
+  ru,
 };
 
 export const useTranslation = () => {
