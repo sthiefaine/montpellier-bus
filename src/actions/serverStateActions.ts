@@ -1,12 +1,8 @@
 
-// @ts-ignore
-const baseUrl = import.meta.env.DEV
-  ? "http://localhost:5000"
-  : "https://montpellier-bus-backend.vercel.app";
-
+import { BASE_URL } from "../helpers/constants";
 
 const checkServerStatusAction = async () => {
-  const response = await fetch(`${baseUrl}/api/health`);
+  const response = await fetch(`${BASE_URL}/api/health`);
   return response.ok;
 };
 

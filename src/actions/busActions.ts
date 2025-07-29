@@ -1,12 +1,7 @@
 import { ApiResponse, Bus, RawBusData, StatusType } from "../types";
-import { COMPANY_COLORS } from "../helpers/constants";
+import { COMPANY_COLORS, BASE_URL } from "../helpers/constants";
 import { formatTimeHHMM } from "../helpers/utils";
 import { apiCache, createTimeBasedCacheKey } from "../utils/apiCache";
-
-// @ts-ignore
-const baseUrl = import.meta.env.DEV
-  ? "http://localhost:5000"
-  : "https://montpellier-bus-backend.vercel.app";
 
 export const fetchBusData = async (): Promise<ApiResponse> => {
   const now = new Date(new Date().setHours(new Date().getHours() - 5));
@@ -15,7 +10,7 @@ export const fetchBusData = async (): Promise<ApiResponse> => {
     new Date().setHours(new Date().getHours() + 8)
   ).toISOString();
 
-  const apiUrl = `${baseUrl}/api/bus-departures-flixbus?from=${encodeURIComponent(
+  const apiUrl = `${BASE_URL}/api/bus-departures-flixbus?from=${encodeURIComponent(
     from
   )}&to=${encodeURIComponent(to)}`;
 
@@ -44,7 +39,7 @@ export const fetchBusDataBlablabus = async (): Promise<ApiResponse> => {
     new Date().setHours(new Date().getHours() + 8)
   ).toISOString();
 
-  const apiUrl = `${baseUrl}/api/bus-departures-blablabus?from=${encodeURIComponent(
+  const apiUrl = `${BASE_URL}/api/bus-departures-blablabus?from=${encodeURIComponent(
     from
   )}&to=${encodeURIComponent(to)}`;
 

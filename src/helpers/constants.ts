@@ -20,3 +20,9 @@ export const BUS_STATUS = {
 };
 
 export const UPDATE_INTERVAL = 60000; // 1 minute
+
+// Configuration de l'URL de base
+// @ts-ignore
+export const BASE_URL = import.meta.env.DEV
+  ? "http://localhost:5000"
+  : "https://montpellier-bus-back.clairdev.com";
